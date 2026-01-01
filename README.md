@@ -1,4 +1,4 @@
-# Introduction: SureBackup
+# SureBackup
 
 SureBackup is a professional, native Win32 application designed for robust folder synchronization and data integrity. Built from the ground up for the Windows environment, it provides a high-performance alternative to generic backup tools, offering bit-perfect mirroring with strict adherence to NTFS file system specifics.
 
@@ -59,4 +59,8 @@ cmake --build . --config Release
 
 ## ⚖ License
 
-Copyright (c) 2026. All rights reserved.
+Copyright (c) 2026. All rights reserved.　MIT License
+
+gemini3 and me made cooperation to develop this software.
+
+
