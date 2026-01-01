@@ -21,6 +21,8 @@ This document provides a direct mapping between the User Interface elements (Men
 | **MAXIMIZE LOG** | `IDM_LOG_MAXIMIZE` | `HandleCommand_LogMaximize` | Toggles between 3-pane view and full-log view. |
 | **Add Set** | `IDM_SET_CREATE` | `OnSetCreate` | Quick access to create a new set. |
 | **Add Unit** | `IDM_UNIT_CREATE` | `OnUnitCreate` | Opens the creation dialogue for a new backup unit. |
+| **Backup Mode Combo** | `ID_MAIN_MODE_COMBO` | `HandleCommand_MainModeChange` | Quick-select Mode (Copy/Sync/Verify) for selected Unit. |
+| **Strategy Engine Combo**| `ID_MAIN_STRATEGY_COMBO`| `HandleCommand_MainStrategyChange`| Quick-select Engine (Std/Par/Blk/Vss/Cmp) for selected Unit. |
 
 ## 3. Management Tree (Left Pane) Context Menu
 
