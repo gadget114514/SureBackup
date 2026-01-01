@@ -1,0 +1,8 @@
+[Default Backup Set]
+My Documents|C:\Users\Example\Documents|D:\Backups\Documents|COPY
+New Unit|C:\|D:\|SYNC
+
+[New Set 2]
+
+[New Set]
+

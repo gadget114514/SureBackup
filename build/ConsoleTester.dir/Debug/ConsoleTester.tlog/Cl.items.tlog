@@ -1,0 +1,6 @@
+D:\ws\SureBackup\src\ConsoleTester.cpp;D:\ws\SureBackup\build\ConsoleTester.dir\Debug\ConsoleTester.obj
+D:\ws\SureBackup\src\BackupEngine.cpp;D:\ws\SureBackup\build\ConsoleTester.dir\Debug\BackupEngine.obj
+D:\ws\SureBackup\src\Strategies\BackupUtils.cpp;D:\ws\SureBackup\build\ConsoleTester.dir\Debug\BackupUtils.obj
+D:\ws\SureBackup\src\Strategies\StandardBackupStrategy.cpp;D:\ws\SureBackup\build\ConsoleTester.dir\Debug\StandardBackupStrategy.obj
+D:\ws\SureBackup\src\Strategies\ParallelBackupStrategy.cpp;D:\ws\SureBackup\build\ConsoleTester.dir\Debug\ParallelBackupStrategy.obj
+D:\ws\SureBackup\src\Strategies\ComparingBackupStrategy.cpp;D:\ws\SureBackup\build\ConsoleTester.dir\Debug\ComparingBackupStrategy.obj

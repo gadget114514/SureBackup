@@ -1,0 +1,6 @@
+D:\ws\SureBackup\src\main.cpp;D:\ws\SureBackup\build\SureBackup.dir\Release\main.obj
+D:\ws\SureBackup\src\BackupEngine.cpp;D:\ws\SureBackup\build\SureBackup.dir\Release\BackupEngine.obj
+D:\ws\SureBackup\src\Strategies\BackupUtils.cpp;D:\ws\SureBackup\build\SureBackup.dir\Release\BackupUtils.obj
+D:\ws\SureBackup\src\Strategies\StandardBackupStrategy.cpp;D:\ws\SureBackup\build\SureBackup.dir\Release\StandardBackupStrategy.obj
+D:\ws\SureBackup\src\Strategies\ParallelBackupStrategy.cpp;D:\ws\SureBackup\build\SureBackup.dir\Release\ParallelBackupStrategy.obj
+D:\ws\SureBackup\src\Strategies\ComparingBackupStrategy.cpp;D:\ws\SureBackup\build\SureBackup.dir\Release\ComparingBackupStrategy.obj

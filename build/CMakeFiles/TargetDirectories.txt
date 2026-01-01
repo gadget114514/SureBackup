@@ -1,0 +1,3 @@
+D:/ws/SureBackup/build/CMakeFiles/SureBackup.dir
+D:/ws/SureBackup/build/CMakeFiles/ALL_BUILD.dir
+D:/ws/SureBackup/build/CMakeFiles/ZERO_CHECK.dir
