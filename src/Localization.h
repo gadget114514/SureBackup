@@ -11,6 +11,8 @@ enum class StrId {
   Menu_RunSet,
   Menu_Preview,
   Menu_Verify,
+  Menu_Log,
+  Menu_LogHistory,
   Menu_Help,
   Menu_About,
   Menu_Set,
@@ -99,7 +101,11 @@ enum class StrId {
   Day_Wed,
   Day_Thu,
   Day_Fri,
-  Day_Sat
+  Day_Sat,
+  Dlg_History_Title,
+  Dlg_History_Date,
+  Dlg_History_Task,
+  Dlg_History_Open
 };
 
 class Localization {
@@ -131,6 +137,8 @@ public:
           {StrId::Menu_Set, L"セット"},
           {StrId::Menu_Unit, L"ユニット"},
           {StrId::Menu_Backup, L"バックアップ"},
+          {StrId::Menu_Log, L"ログ"},
+          {StrId::Menu_LogHistory, L"実行履歴..."},
 
           {StrId::Ctx_Run, L"実行"},
           {StrId::Ctx_Preview, L"プレビュー"},
@@ -211,6 +219,10 @@ public:
           {StrId::Day_Thu, L"木曜日"},
           {StrId::Day_Fri, L"金曜日"},
           {StrId::Day_Sat, L"土曜日"},
+          {StrId::Dlg_History_Title, L"実行履歴"},
+          {StrId::Dlg_History_Date, L"実行日時"},
+          {StrId::Dlg_History_Task, L"タスク名"},
+          {StrId::Dlg_History_Open, L"ログを開く"},
 
           {StrId::Msg_ConfirmDeleteSet,
            L"このバックアップセットを削除してもよろしいですか？"},
@@ -241,6 +253,8 @@ public:
           {StrId::Menu_Set, L"Conjunto"},
           {StrId::Menu_Unit, L"Unidad"},
           {StrId::Menu_Backup, L"Respaldo"},
+          {StrId::Menu_Log, L"Registro"},
+          {StrId::Menu_LogHistory, L"Historial de Ejecución..."},
 
           {StrId::Ctx_Run, L"Ejecutar"},
           {StrId::Ctx_Preview, L"Vista Previa"},
@@ -321,6 +335,10 @@ public:
           {StrId::Day_Thu, L"Jueves"},
           {StrId::Day_Fri, L"Viernes"},
           {StrId::Day_Sat, L"Sábado"},
+          {StrId::Dlg_History_Title, L"Historial de Ejecución"},
+          {StrId::Dlg_History_Date, L"Fecha y Hora"},
+          {StrId::Dlg_History_Task, L"Nombre de la Tarea"},
+          {StrId::Dlg_History_Open, L"Abrir Registro"},
 
           {StrId::Msg_ConfirmDeleteSet,
            L"¿Está seguro de que desea eliminar este conjunto de respaldo?"},
@@ -353,6 +371,8 @@ public:
           {StrId::Menu_Set, L"Ensemble"},
           {StrId::Menu_Unit, L"Unité"},
           {StrId::Menu_Backup, L"Sauvegarde"},
+          {StrId::Menu_Log, L"Journal"},
+          {StrId::Menu_LogHistory, L"Historique d'exécution..."},
 
           {StrId::Ctx_Run, L"Exécuter"},
           {StrId::Ctx_Preview, L"Aperçu"},
@@ -430,6 +450,10 @@ public:
           {StrId::Day_Thu, L"Jeudi"},
           {StrId::Day_Fri, L"Vendredi"},
           {StrId::Day_Sat, L"Samedi"},
+          {StrId::Dlg_History_Title, L"Historique d'exécution"},
+          {StrId::Dlg_History_Date, L"Date et Heure"},
+          {StrId::Dlg_History_Task, L"Nom de la tâche"},
+          {StrId::Dlg_History_Open, L"Ouvrir le journal"},
 
           {StrId::Msg_ConfirmDeleteSet, L"Êtes-vous sûr de vouloir supprimer "
                                         L"cet ensemble de sauvegarde ?"},
@@ -461,6 +485,8 @@ public:
           {StrId::Menu_Set, L"Set"},
           {StrId::Menu_Unit, L"Einheit"},
           {StrId::Menu_Backup, L"Backup"},
+          {StrId::Menu_Log, L"Protokoll"},
+          {StrId::Menu_LogHistory, L"Ausführungsverlauf..."},
 
           {StrId::Ctx_Run, L"Ausführen"},
           {StrId::Ctx_Preview, L"Vorschau"},
@@ -538,6 +564,10 @@ public:
           {StrId::Day_Thu, L"Donnerstag"},
           {StrId::Day_Fri, L"Freitag"},
           {StrId::Day_Sat, L"Samstag"},
+          {StrId::Dlg_History_Title, L"Ausführungsverlauf"},
+          {StrId::Dlg_History_Date, L"Datum und Uhrzeit"},
+          {StrId::Dlg_History_Task, L"Task-Name"},
+          {StrId::Dlg_History_Open, L"Protokoll öffnen"},
 
           {StrId::Msg_ConfirmDeleteSet,
            L"Sind Sie sicher, dass Sie dieses Backup-Set löschen möchten?"},
@@ -569,6 +599,8 @@ public:
           {StrId::Menu_Set, L"Set"},
           {StrId::Menu_Unit, L"Unit"},
           {StrId::Menu_Backup, L"Backup"},
+          {StrId::Menu_Log, L"Log"},
+          {StrId::Menu_LogHistory, L"Execution History..."},
 
           {StrId::Ctx_Run, L"Run"},
           {StrId::Ctx_Preview, L"Preview"},
@@ -660,7 +692,11 @@ public:
           {StrId::Day_Wed, L"Wednesday"},
           {StrId::Day_Thu, L"Thursday"},
           {StrId::Day_Fri, L"Friday"},
-          {StrId::Day_Sat, L"Saturday"}};
+          {StrId::Day_Sat, L"Saturday"},
+          {StrId::Dlg_History_Title, L"Execution History"},
+          {StrId::Dlg_History_Date, L"Date & Time"},
+          {StrId::Dlg_History_Task, L"Task Name"},
+          {StrId::Dlg_History_Open, L"Open Log"}};
     }
   }
 

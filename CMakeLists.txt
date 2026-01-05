@@ -23,6 +23,8 @@ set(HEADER_FILES
     src/Strategies/StandardBackupStrategy.h
     src/Strategies/ComparingBackupStrategy.h
     src/Strategies/Types.h
+    src/resources/resource.h
+    src/resources/resource.rc
 )
 
 add_executable(SureBackup WIN32 src/main.cpp ${CORE_LOGIC} ${HEADER_FILES})

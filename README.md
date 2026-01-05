@@ -1,66 +1,75 @@
-# SureBackup
+# <img src="src/resources/app_icon.png" width="48" height="48" valign="middle"> SureBackup
 
-SureBackup is a professional, native Win32 application designed for robust folder synchronization and data integrity. Built from the ground up for the Windows environment, it provides a high-performance alternative to generic backup tools, offering bit-perfect mirroring with strict adherence to NTFS file system specifics.
+[![Platform](https://img.shields.io/badge/Platform-Windows-blue.svg)](https://www.microsoft.com/windows)
+[![C++](https://img.shields.io/badge/C++-17-blue.svg)](https://en.cppreference.com/w/cpp/17)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Whether you are managing large-scale server backups or synchronizing personal local drives, SureBackup provides the precision and transparency required for enterprise-grade data management.
+**SureBackup** is a professional, native Win32 application designed for robust folder synchronization and data integrity. Built for the Windows environment, it provides a high-performance alternative to generic backup tools, offering bit-perfect mirroring with strict adherence to NTFS file system specifics.
 
-## 🌟 Core Value Proposition
+![SureBackup App Snapshot](doc/app-snapshot.jpg)
 
-*   **Native Performance**: Leverages pure Win32 APIs for a zero-dependency, high-speed execution.
-*   **Data Fidelity**: Preserves the complete identity of your files, including Alternate Data Streams (ADS), Symbolic Links, and exact timestamps.
-*   **High-Speed Parallelism**: A modern multithreaded engine that saturates storage bandwidth while providing granular monitoring.
-*   **Total Transparency**: Every action is logged and verified, ensuring you have a complete audit trail of your backup session.
+---
 
-*   **Native Precision**: Built 100% with the Win32 API. No heavy frameworks, just pure Windows performance.
-*   **High-Speed Parallel Engine**: Multithreaded backup and synchronization engine with real-time worker dashboards and aggregate progress tracking.
-*   **Advanced NTFS Support**: Full support for **Alternate Data Streams (ADS)** and **Symbolic Links** (files and directories).
-*   **Bit-Perfect Verification**: Optional 16KB block-level byte-by-byte comparison to ensure data integrity beyond simple timestamp checks.
-*   **High-Fidelity Metadata**: Strictly preserves file/directory modification and creation times.
-*   **Flexible Sync Modes**:
-    *   **Copy (Append)**: Process only new or updated files.
-    *   **Sync (Mirror)**: Perfectly mirror source to target, including orphan removal.
-    *   **Verify Only**: Simulation/Preview pass without any file modifications.
-*   **Globalized**: Fully localized for **English, Japanese, French, German, and Spanish**.
-*   **Reliable Scheduling**: Integrated daily/weekly task scheduler with persistence.
+## 🚀 Key Features
+
+*   **⚡ Native Performance**: Pure Win32 API implementation for zero-dependency, high-speed execution. No heavy frameworks, just performance.
+*   **🏎️ High-Speed Parallel Engine**: Multithreaded backup and synchronization with real-time worker dashboards and aggregate progress tracking.
+*   **📂 Advanced NTFS Support**: Full support for **Alternate Data Streams (ADS)** and **Symbolic Links** (files and directories).
+*   **🛡️ Bit-Perfect Verification**: Optional 16KB block-level byte-by-byte comparison to ensure data integrity beyond simple timestamp checks.
+*   **⏱️ High-Fidelity Metadata**: Strictly preserves file/directory modification and creation times.
+*   **🌍 Globalized**: Native support for **English, Japanese, French, German, and Spanish**.
+*   **📅 Reliable Scheduling**: Integrated daily/weekly task scheduler with persistence.
 
 ## 🛠 Multi-Engine Architecture
 
-SureBackup dynamically selects the best strategy for your task:
-- **Standard**: Sequential processing for maximum stability on any media.
-- **Parallel**: Optimized for SSDs and high-speed networks using a producer-consumer worker pool.
-- **Comparison**: Dedicated integrity checking engine.
-- **Experimental**: Support for VSS (Snapshot) and Block Clone strategies.
+SureBackup dynamically selects the optimal strategy for your task:
+
+| Engine | Ideal For | Strategy |
+| :--- | :--- | :--- |
+| **Standard** | HDD, Network | Sequential processing for maximum stability. |
+| **Parallel** | SSD, High-speed LAN | Optimized producer-consumer worker pool. |
+| **Comparison** | Audit, Validation | Dedicated bit-level integrity checking. |
+| **Experimental** | Advanced Lab | Support for VSS Snapshots and Block Cloning. |
 
 ## 🖥 User Interface
 
 *   **Management Tree**: Organize and batch process multiple "Backup Units" grouped into "Backup Sets".
-*   **Integrated Explorers**: Quick-select source and target folders using the built-in file system discovery trees.
+*   **Integrated Explorers**: Quick-select source and target folders using built-in file system discovery trees.
 *   **Task Dashboard**: Detailed execution logs with a "Maximize" mode for deep review.
-*   **Quick Edit**: Change backup modes and engines directly from the main window without nesting deep into dialogs.
+*   **Dynamic Controls**: Change backup modes and engines directly from the main interface.
+
+## 🏗 Build Instructions
+
+### Prerequisites
+- Windows 10/11
+- Visual Studio (MSVC) with C++17 support
+- CMake 3.10+
+
+### Build Steps
+```powershell
+# Create build directory
+mkdir build
+cd build
+
+# Configure and generate
+cmake ..
+
+# Build the project
+cmake --build . --config Release
+```
 
 ## 📂 Project Structure
 
 - `src/`: Core Win32 application logic and backup engines.
-- `src/Strategies/`: Modular implementations of different backup/sync strategies.
-- `doc/`: Detailed requirements, architecture, and UI mappings.
+- `src/Strategies/`: Modular implementations of backup/sync strategies.
+- `doc/`: Detailed requirements, architecture documentation, and UI mappings.
 
-## 🏗 Build Requirements
+## 🤝 Acknowledgements
 
-- **Platform**: Windows 10/11
-- **Compiler**: MSVC (C++17 recommended)
-- **Build System**: CMake
-
-```powershell
-mkdir build
-cd build
-cmake ..
-cmake --build . --config Release
-```
+This project was developed through a collaborative effort between the lead developer and **Antigravity (AI)**.
 
 ## ⚖ License
 
-Copyright (c) 2026. All rights reserved.　MIT License
+This project is licensed under the **MIT License**.
 
-gemini3 and me made cooperation to develop this software.
-
-
+Copyright (c) 2026. All rights reserved.

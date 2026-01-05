@@ -19,6 +19,7 @@
 
 #define _PRSHT_H_
 #include <commctrl.h>
+#include <shellapi.h>
 #include <shlwapi.h>
 
 #include <algorithm>
@@ -39,8 +40,10 @@
 #include "Configuration.h"
 #include "Localization.h"
 #include "Strategies/ComparingBackupStrategy.h"
+#include "Strategies/IBackupStrategy.h"
 #include "Strategies/ParallelBackupStrategy.h"
 #include "Strategies/StandardBackupStrategy.h"
+#include "resources/resource.h"
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "shlwapi.lib")
@@ -101,6 +104,10 @@ int g_selectedUnitIndex = -1;
 #define ID_PROGRESS_BAR 113
 #define ID_MAIN_MODE_COMBO 114
 #define ID_MAIN_STRATEGY_COMBO 115
+
+#define IDM_LOG_HISTORY 1010
+#define ID_LIST_HISTORY 1011
+#define ID_BTN_HISTORY_OPEN 1012
 
 // Menu IDs
 #define IDM_FILE_EXIT 203
@@ -233,7 +240,8 @@ public:
     std::wstringstream ss;
     ss << std::put_time(&timeinfo, L"%Y%m%d_%H%M%S");
 
-    std::wstring finalName = safeTitle + L"_" + ss.str() + L".txt";
+    std::wstring finalName =
+        safeTitle + L"_" + ss.str() + (m_hasErrors ? L"_ERR" : L"") + L".txt";
     fs::path dstFile = baseDir / finalName;
 
     try {
@@ -366,7 +374,10 @@ void InitImageList() {
   }
 
   // 3: Set icon (application icon)
-  HICON hIconSet = LoadIcon(NULL, IDI_APPLICATION);
+  HICON hIconSet =
+      LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_APP_ICON));
+  if (!hIconSet)
+    hIconSet = LoadIcon(NULL, IDI_APPLICATION);
   ImageList_AddIcon(g_hImageList, hIconSet);
 
   // 4: Unit icon (generic file)
@@ -937,6 +948,174 @@ LRESULT CALLBACK UnitEditDlgProc(HWND hWnd, UINT message, WPARAM wParam,
   return 0;
 }
 
+struct HistoryEntry {
+  std::wstring fileName;
+  std::wstring taskName;
+  std::wstring dateTime;
+  bool hasError = false;
+};
+
+LRESULT CALLBACK LogHistoryDlgProc(HWND hWnd, UINT message, WPARAM wParam,
+                                   LPARAM lParam) {
+  HFONT hFont = (HFONT)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+  std::vector<HistoryEntry> *pEntries =
+      (std::vector<HistoryEntry> *)GetPropW(hWnd, L"Entries");
+
+  switch (message) {
+  case WM_CREATE: {
+    hFont =
+        CreateFontW(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET,
+                    OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                    DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI");
+    SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)hFont);
+
+    HWND hList = CreateWindowExW(
+        0, WC_LISTVIEWW, L"",
+        WS_CHILD | WS_VISIBLE | LVS_REPORT | LVS_SINGLESEL | WS_BORDER, 10, 10,
+        580, 400, hWnd, (HMENU)ID_LIST_HISTORY, hInst, NULL);
+
+    SendMessageW(hList, WM_SETFONT, (WPARAM)hFont, TRUE);
+    ListView_SetExtendedListViewStyle(hList,
+                                      LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+
+    LVCOLUMNW lvc = {0};
+    lvc.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+
+    lvc.iSubItem = 0;
+    lvc.cx = 200;
+    lvc.pszText = (LPWSTR)Localization::Get(StrId::Dlg_History_Date);
+    ListView_InsertColumn(hList, 0, &lvc);
+
+    lvc.iSubItem = 1;
+    lvc.cx = 360;
+    lvc.pszText = (LPWSTR)Localization::Get(StrId::Dlg_History_Task);
+    ListView_InsertColumn(hList, 1, &lvc);
+
+    HWND hBtnOpen =
+        CreateWindowW(L"BUTTON", Localization::Get(StrId::Dlg_History_Open),
+                      WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 450, 420, 140, 30,
+                      hWnd, (HMENU)ID_BTN_HISTORY_OPEN, hInst, NULL);
+    SendMessageW(hBtnOpen, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+    pEntries = new std::vector<HistoryEntry>();
+    SetPropW(hWnd, L"Entries", (HANDLE)pEntries);
+
+    std::wstring cfgPath = ConfigManager::GetConfigPath();
+    fs::path logDir = fs::path(cfgPath).parent_path();
+
+    try {
+      if (fs::exists(logDir)) {
+        for (const auto &entry : fs::directory_iterator(logDir)) {
+          if (fs::is_regular_file(entry.status()) &&
+              entry.path().extension() == ".txt") {
+            std::wstring fname = entry.path().filename().wstring();
+            if (fname == L"config.txt" || fname == L"last_run.txt")
+              continue;
+
+            bool isErr = (fname.find(L"_ERR.txt") != std::wstring::npos);
+            std::wstring cleanName = fname;
+            if (isErr) {
+              size_t pos = cleanName.find(L"_ERR.txt");
+              cleanName.replace(pos, 8, L".txt");
+            }
+
+            size_t lastUnder = cleanName.find_last_of(L'_');
+            if (lastUnder != std::wstring::npos && lastUnder > 0) {
+              std::wstring task = cleanName.substr(0, lastUnder);
+              std::wstring tsPart = cleanName.substr(lastUnder + 1);
+              // Expected format: YYYYMMDD_HHMMSS.txt (15+ chars excluding .txt)
+              if (tsPart.length() >= 15) {
+                std::wstring datePart = tsPart.substr(0, 8);
+                std::wstring timePart = tsPart.substr(9, 6);
+                if (datePart.length() == 8 && timePart.length() == 6) {
+                  std::wstring formattedDate =
+                      datePart.substr(0, 4) + L"/" + datePart.substr(4, 2) +
+                      L"/" + datePart.substr(6, 2) + L" " +
+                      timePart.substr(0, 2) + L":" + timePart.substr(2, 2) +
+                      L":" + timePart.substr(4, 2);
+
+                  HistoryEntry he;
+                  he.fileName = entry.path().wstring();
+                  he.taskName = task + (isErr ? L" [ERROR]" : L"");
+                  he.dateTime = formattedDate;
+                  he.hasError = isErr;
+                  pEntries->push_back(he);
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (...) {
+    }
+
+    std::sort(pEntries->begin(), pEntries->end(),
+              [](const HistoryEntry &a, const HistoryEntry &b) {
+                return a.dateTime > b.dateTime;
+              });
+
+    for (int i = 0; i < (int)pEntries->size(); ++i) {
+      LVITEMW lvi = {0};
+      lvi.mask = LVIF_TEXT | LVIF_PARAM;
+      lvi.iItem = i;
+      lvi.iSubItem = 0;
+      lvi.pszText = (LPWSTR)(*pEntries)[i].dateTime.c_str();
+      lvi.lParam = i;
+      ListView_InsertItem(hList, &lvi);
+      ListView_SetItemText(hList, i, 1,
+                           (LPWSTR)(*pEntries)[i].taskName.c_str());
+    }
+    break;
+  }
+  case WM_COMMAND:
+    if (LOWORD(wParam) == ID_BTN_HISTORY_OPEN) {
+      HWND hList = GetDlgItem(hWnd, ID_LIST_HISTORY);
+      int sel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+      if (sel != -1 && pEntries) {
+        ShellExecuteW(NULL, L"open", (*pEntries)[sel].fileName.c_str(), NULL,
+                      NULL, SW_SHOWNORMAL);
+      }
+    }
+    break;
+  case WM_NOTIFY: {
+    NMHDR *nm = (NMHDR *)lParam;
+    if (nm->idFrom == ID_LIST_HISTORY && nm->code == NM_DBLCLK) {
+      HWND hList = GetDlgItem(hWnd, ID_LIST_HISTORY);
+      int sel = ListView_GetNextItem(hList, -1, LVNI_SELECTED);
+      if (sel != -1 && pEntries) {
+        ShellExecuteW(NULL, L"open", (*pEntries)[sel].fileName.c_str(), NULL,
+                      NULL, SW_SHOWNORMAL);
+      }
+    }
+    break;
+  }
+  case WM_CLOSE:
+    DestroyWindow(hWnd);
+    break;
+  case WM_DESTROY: {
+    hFont = (HFONT)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (hFont)
+      DeleteObject(hFont);
+    pEntries = (std::vector<HistoryEntry> *)GetPropW(hWnd, L"Entries");
+    if (pEntries)
+      delete pEntries;
+    RemovePropW(hWnd, L"Entries");
+    break;
+  }
+  default:
+    return DefWindowProcW(hWnd, message, wParam, lParam);
+  }
+  return 0;
+}
+
+static void OnLogHistory(HWND hWnd) {
+  HWND hHistory = CreateWindowExW(
+      0, L"LogHistoryClass", Localization::Get(StrId::Dlg_History_Title),
+      WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
+      620, 520, hWnd, NULL, hInst, NULL);
+  ShowWindow(hHistory, SW_SHOW);
+}
+
 LRESULT CALLBACK SetEditDlgProc(HWND hWnd, UINT message, WPARAM wParam,
                                 LPARAM lParam) {
   static BackupSet *pSet = nullptr;
@@ -1131,6 +1310,12 @@ static void InitializeMainUI(HWND hWnd) {
               Localization::Get(StrId::Main_Stop));
   AppendMenuW(hMenu, MF_POPUP, (UINT_PTR)hBackup,
               Localization::Get(StrId::Menu_Backup));
+
+  HMENU hLog = CreateMenu();
+  AppendMenuW(hLog, MF_STRING, IDM_LOG_HISTORY,
+              Localization::Get(StrId::Menu_LogHistory));
+  AppendMenuW(hMenu, MF_POPUP, (UINT_PTR)hLog,
+              Localization::Get(StrId::Menu_Log));
 
   HMENU hHelp = CreateMenu();
   AppendMenuW(hHelp, MF_STRING, IDM_HELP_ABOUT,
@@ -1771,15 +1956,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     case IDM_HELP_ABOUT:
       MessageBoxW(
           hWnd,
-          L"SureBackup v1.0\n\n"
-          L"Concepts:\n"
-          L"- Backup Set: A collection of backup units that can be scheduled "
-          L"or run together.\n"
-          L"- Backup Unit: A single backup task defining a source, target, and "
-          L"specific rules (Copy/Sync).\n\n"
-          L"A professional native Win32 backup and "
-          L"synchronization tool.\nSupports NTFS Alternate Data Streams, "
-          L"Symbolic Links, and Byte-by-Byte verification.",
+          L"SureBackup v1.1\n\n"
+          L"A professional native Win32 backup and synchronization tool.\n"
+          L"Designed for high-fidelity data protection with NTFS "
+          L"optimization.\n\n"
+          L"Features:\n"
+          L"- Multithreaded Parallel Engine\n"
+          L"- NTFS Alternate Data Streams (ADS) Support\n"
+          L"- Directory & File Symbolic Link Preservation\n"
+          L"- Bit-Perfect Byte-by-Byte Verification\n"
+          L"- Persistent Execution History\n\n"
+          L"Developed in collaboration with Antigravity (AI).",
           Localization::Get(StrId::Menu_About), MB_OK | MB_ICONINFORMATION);
       break;
     case IDM_SET_AS_SOURCE:
@@ -1833,6 +2020,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     } break;
     case IDM_LOG_MAXIMIZE:
       HandleCommand_LogMaximize(hWnd);
+      break;
+    case IDM_LOG_HISTORY:
+      OnLogHistory(hWnd);
       break;
     case ID_MAIN_MODE_COMBO:
       if (HIWORD(wParam) == CBN_SELCHANGE)
@@ -1890,6 +2080,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
   wc.style = CS_HREDRAW | CS_VREDRAW;
   wc.lpfnWndProc = WndProc;
   wc.hInstance = hInstance;
+  wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APP_ICON));
+  wc.hIconSm = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_APP_ICON),
+                                IMAGE_ICON, 16, 16, 0);
   wc.hCursor = LoadCursor(NULL, IDC_ARROW);
   wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
   wc.lpszClassName = L"SureBackupClass";
@@ -1918,6 +2111,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
   wcs.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
   wcs.lpszClassName = L"SetEditDlgClass";
   RegisterClassExW(&wcs);
+
+  WNDCLASSEXW wlh = {sizeof(wlh)};
+  wlh.lpfnWndProc = LogHistoryDlgProc;
+  wlh.hInstance = hInstance;
+  wlh.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wlh.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
+  wlh.lpszClassName = L"LogHistoryClass";
+  RegisterClassExW(&wlh);
 
   hMainWindow = CreateWindowExW(
       0, L"SureBackupClass", L"SureBackup", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,

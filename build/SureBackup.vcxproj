@@ -343,6 +343,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\ws\SureBackup\src\Strategies\StandardBackupStrategy.h" />
     <ClInclude Include="D:\ws\SureBackup\src\Strategies\ComparingBackupStrategy.h" />
     <ClInclude Include="D:\ws\SureBackup\src\Strategies\Types.h" />
+    <ClInclude Include="D:\ws\SureBackup\src\resources\resource.h" />
+    <ResourceCompile Include="D:\ws\SureBackup\src\resources\resource.rc" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
