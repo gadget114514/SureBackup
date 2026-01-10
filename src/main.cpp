@@ -1956,7 +1956,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
     case IDM_HELP_ABOUT:
       MessageBoxW(
           hWnd,
-          L"SureBackup v1.1\n\n"
+          L"SureBackup v"
+          L"1.1.0"
+          L"\n\n"
           L"A professional native Win32 backup and synchronization tool.\n"
           L"Designed for high-fidelity data protection with NTFS "
           L"optimization.\n\n"
@@ -2121,8 +2123,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
   RegisterClassExW(&wlh);
 
   hMainWindow = CreateWindowExW(
-      0, L"SureBackupClass", L"SureBackup", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-      CW_USEDEFAULT, 1400, 900, NULL, NULL, hInstance, NULL);
+      0, L"SureBackupClass", L"SureBackup v1.1.0", WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, CW_USEDEFAULT, 1400, 900, NULL, NULL, hInstance, NULL);
   ShowWindow(hMainWindow, nCmdShow);
   UpdateWindow(hMainWindow);
   MSG msg;
